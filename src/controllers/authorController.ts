@@ -1,16 +1,17 @@
-import type { Request, Response,} from "express";
+import type { Request, Response, NextFunction } from "express";
+
 import { authors, type Author } from "../models/Author.js";
 
-// GET authors
-export const getAuthors = (
-  req: Request,
-  res: Response,
-) => { res.status(200).json(authors)};
+import { ApiError } from "../utils/ApiError.js";
 
-// POST authors
-export const createAuthor = (
-  req: Request,
-  res: Response,) => {const { name } = req.body;
+// GET all authors
+export const getAuthors = (req: Request, res: Response) => {
+  res.status(200).json(authors);
+};
+
+// POST (create) author
+export const createAuthor = (req: Request, res: Response) => {
+  const { name } = req.body;
 
   const newAuthor: Author = {
     id: authors.length + 1,
@@ -22,42 +23,37 @@ export const createAuthor = (
   res.status(201).json(newAuthor);
 };
 
-// GET authors by id
+// GET author by ID
 export const getAuthorById = (
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const id = Number(req.params.id);
 
-  const author = authors.find(
-    (author) => author.id === id,
-  );
+  const author = authors.find((author) => author.id === id);
 
   if (!author) {
-    return res.status(404).json({
-      message: "Author not found",
-    });
+    return next(new ApiError(404, "Author not found"));
   }
 
   res.status(200).json(author);
 };
 
-// PUT(Update) authors by id
+// PUT (update) author by ID
 export const updateAuthor = (
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const id = Number(req.params.id);
+
   const { name } = req.body;
 
-  const author = authors.find(
-    (author) => author.id === id,
-  );
+  const author = authors.find((author) => author.id === id);
 
   if (!author) {
-    return res.status(404).json({
-      message: "Author not found",
-    });
+    return next(new ApiError(404, "Author not found"));
   }
 
   author.name = name;
@@ -65,21 +61,18 @@ export const updateAuthor = (
   res.status(200).json(author);
 };
 
-// DELETE authors by id
+// DELETE author by ID
 export const deleteAuthor = (
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const id = Number(req.params.id);
 
-  const authorIndex = authors.findIndex(
-    (author) => author.id === id,
-  );
+  const authorIndex = authors.findIndex((author) => author.id === id);
 
   if (authorIndex === -1) {
-    return res.status(404).json({
-      message: "Author not found",
-    });
+    return next(new ApiError(404, "Author not found"));
   }
 
   authors.splice(authorIndex, 1);
