@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
+
 import { books, type Book } from "../models/Book.js";
+
 import { authors } from "../models/Author.js";
+
 import { ApiError } from "../utils/ApiError.js";
 
 // GET all books
@@ -52,9 +55,28 @@ export const getBooks = (req: Request, res: Response) => {
   }
 
   // Pagination
-  if (page && limit) {
+  if (page || limit) {
+    // Both page and limit must be provided
+    if (!page || !limit) {
+      return res.status(400).json({
+        message: "Both page and limit are required for pagination",
+      });
+    }
+
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
+
+    // Validate page and limit
+    if (
+      !Number.isInteger(pageNumber) ||
+      !Number.isInteger(limitNumber) ||
+      pageNumber < 1 ||
+      limitNumber < 1
+    ) {
+      return res.status(400).json({
+        message: "Page and limit must be positive whole numbers",
+      });
+    }
 
     const startIndex = (pageNumber - 1) * limitNumber;
 
