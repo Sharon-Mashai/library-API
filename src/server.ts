@@ -1,11 +1,13 @@
 import express from "express";
 import authorRoutes from "./routes/authorRoutes.js";
+import { logger } from "./middleware/logger.js";
 
 const app = express();
 const PORT = 4000;
 
-// Middleware for reading JSON request bodies
+// Middleware
 app.use(express.json());
+app.use(logger);
 
 // Author routes
 app.use("/authors", authorRoutes);
