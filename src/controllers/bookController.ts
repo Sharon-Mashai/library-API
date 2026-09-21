@@ -1,30 +1,35 @@
-import type { Request, Response,} from "express";
-import { books, type Book,} from "../models/Book.js";
+import type { Request, Response } from "express";
+import { books, type Book } from "../models/Book.js";
 import { authors } from "../models/Author.js";
 
-// GET books
-export const getBooks = (
-  req: Request,
-  res: Response,
-) => {
+// GET all books
+export const getBooks = (req: Request, res: Response) => {
   res.status(200).json(books);
 };
 
-// POST books
-export const createBook = (
-  req: Request,
-  res: Response,
-) => {
+// POST(create) a new book
+export const createBook = (req: Request, res: Response) => {
   const { title, year, authorId } = req.body;
 
   // Check if the author exists
-  const author = authors.find(
-    (author) => author.id === authorId,
-  );
+  const author = authors.find((author) => author.id === authorId);
 
   if (!author) {
     return res.status(400).json({
       message: "Invalid authorId",
+    });
+  }
+
+  // Check if the book already exists
+  const duplicateBook = books.find(
+    (book) =>
+      book.title.toLowerCase() === title.toLowerCase() &&
+      book.authorId === authorId,
+  );
+
+  if (duplicateBook) {
+    return res.status(409).json({
+      message: "Book already exists",
     });
   }
 
@@ -40,16 +45,11 @@ export const createBook = (
   res.status(201).json(newBook);
 };
 
-// GET books by id
-export const getBookById = (
-  req: Request,
-  res: Response,
-) => {
+// GET book by ID
+export const getBookById = (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
-  const book = books.find(
-    (book) => book.id === id,
-  );
+  const book = books.find((book) => book.id === id);
 
   if (!book) {
     return res.status(404).json({
@@ -60,18 +60,14 @@ export const getBookById = (
   res.status(200).json(book);
 };
 
-// PUT(Update) books by id
-export const updateBook = (
-  req: Request,
-  res: Response,
-) => {
+// PUT (update) book by ID
+export const updateBook = (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
   const { title, year, authorId } = req.body;
 
-  const book = books.find(
-    (book) => book.id === id,
-  );
+  // Check if the book exists
+  const book = books.find((book) => book.id === id);
 
   if (!book) {
     return res.status(404).json({
@@ -79,14 +75,26 @@ export const updateBook = (
     });
   }
 
-  // Check if the new author exists
-  const author = authors.find(
-    (author) => author.id === authorId,
-  );
+  // Check if the author exists
+  const author = authors.find((author) => author.id === authorId);
 
   if (!author) {
     return res.status(400).json({
       message: "Invalid authorId",
+    });
+  }
+
+  // Check for duplicate book
+  const duplicateBook = books.find(
+    (existingBook) =>
+      existingBook.id !== id &&
+      existingBook.title.toLowerCase() === title.toLowerCase() &&
+      existingBook.authorId === authorId,
+  );
+
+  if (duplicateBook) {
+    return res.status(409).json({
+      message: "Book already exists",
     });
   }
 
@@ -97,16 +105,11 @@ export const updateBook = (
   res.status(200).json(book);
 };
 
-// DELETE books by id
-export const deleteBook = (
-  req: Request,
-  res: Response,
-) => {
+// DELETE book by ID
+export const deleteBook = (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
-  const bookIndex = books.findIndex(
-    (book) => book.id === id,
-  );
+  const bookIndex = books.findIndex((book) => book.id === id);
 
   if (bookIndex === -1) {
     return res.status(404).json({
