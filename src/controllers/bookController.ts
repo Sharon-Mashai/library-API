@@ -4,9 +4,9 @@ import { authors } from "../models/Author.js";
 import { ApiError } from "../utils/ApiError.js";
 
 // GET all books
-// Search/filter by title, year, or author
+// Search, filter, sort, and paginate books
 export const getBooks = (req: Request, res: Response) => {
-  const { title, year, author } = req.query;
+  const { title, year, author, sort, page, limit } = req.query;
 
   // Create a copy of the books array
   let filteredBooks = [...books];
@@ -34,6 +34,33 @@ export const getBooks = (req: Request, res: Response) => {
     filteredBooks = filteredBooks.filter((book) =>
       authorIds.includes(book.authorId),
     );
+  }
+
+  // Sort by title A-Z
+  if (sort === "title") {
+    filteredBooks.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  // Sort by year - oldest to newest
+  if (sort === "year") {
+    filteredBooks.sort((a, b) => a.year - b.year);
+  }
+
+  // Sort by year - newest to oldest
+  if (sort === "year-desc") {
+    filteredBooks.sort((a, b) => b.year - a.year);
+  }
+
+  // Pagination
+  if (page && limit) {
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    const startIndex = (pageNumber - 1) * limitNumber;
+
+    const endIndex = startIndex + limitNumber;
+
+    filteredBooks = filteredBooks.slice(startIndex, endIndex);
   }
 
   res.status(200).json(filteredBooks);
