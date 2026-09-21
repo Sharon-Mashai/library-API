@@ -8,8 +8,9 @@ export const validateBook = (
   const { title, year, authorId } = req.body;
 
   const missingFields: string[] = [];
+  const invalidFields: string[] = [];
 
-  // Check for missing fields
+  // Check missing fields
   if (title === undefined || title === null || title === "") {
     missingFields.push("title");
   }
@@ -31,30 +32,23 @@ export const validateBook = (
     });
   }
 
-  // Validate title type
-  if (typeof title !== "string") {
-    return res.status(400).json({
-      message: "Title must be a string",
-    });
+  // Check invalid fields
+  if (typeof title !== "string" || title.trim() === "") {
+    invalidFields.push("title must be a valid string");
   }
 
-  if (title.trim() === "") {
-    return res.status(400).json({
-      message: "Title is required",
-    });
-  }
-
-  // Validate year type
   if (typeof year !== "number") {
-    return res.status(400).json({
-      message: "Year must be a number",
-    });
+    invalidFields.push("year must be a number");
   }
 
-  // Validate authorId type
   if (typeof authorId !== "number") {
+    invalidFields.push("authorId must be a number");
+  }
+
+  // Return all invalid fields
+  if (invalidFields.length > 0) {
     return res.status(400).json({
-      message: "AuthorId must be a number",
+      message: invalidFields.join(", "),
     });
   }
 
