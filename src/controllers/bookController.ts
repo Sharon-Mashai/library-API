@@ -39,3 +39,23 @@ export const createBook = (
 
   res.status(201).json(newBook);
 };
+
+// GET books by id
+export const getBookById = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+
+  const book = books.find(
+    (book) => book.id === id,
+  );
+
+  if (!book) {
+    return res.status(404).json({
+      message: "Book not found",
+    });
+  }
+
+  res.status(200).json(book);
+};
