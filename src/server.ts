@@ -1,5 +1,6 @@
 import express from "express";
 import authorRoutes from "./routes/authorRoutes.js";
+import bookroutes from "./routes/bookRoutes.js" ;
 import { logger } from "./middleware/logger.js";
 
 const app = express();
@@ -11,6 +12,7 @@ app.use(logger);
 
 // Author routes
 app.use("/authors", authorRoutes);
+app.use("/books", bookroutes);
 
 // Start server
 app.listen(PORT, () => {
