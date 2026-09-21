@@ -1,11 +1,45 @@
 import type { Request, Response, NextFunction } from "express";
+
 import { books, type Book } from "../models/Book.js";
+
 import { authors } from "../models/Author.js";
+
 import { ApiError } from "../utils/ApiError.js";
 
 // GET all books
+// Search/filter by title, year, or author
 export const getBooks = (req: Request, res: Response) => {
-  res.status(200).json(books);
+  const { title, year, author } = req.query;
+
+  // Create a copy of the books array
+  let filteredBooks = [...books];
+
+  // Filter by title
+  if (title) {
+    filteredBooks = filteredBooks.filter((book) =>
+      book.title.toLowerCase().includes(String(title).toLowerCase()),
+    );
+  }
+
+  // Filter by year
+  if (year) {
+    filteredBooks = filteredBooks.filter((book) => book.year === Number(year));
+  }
+
+  // Filter by author name
+  if (author) {
+    const matchingAuthors = authors.filter((authorItem) =>
+      authorItem.name.toLowerCase().includes(String(author).toLowerCase()),
+    );
+
+    const authorIds = matchingAuthors.map((authorItem) => authorItem.id);
+
+    filteredBooks = filteredBooks.filter((book) =>
+      authorIds.includes(book.authorId),
+    );
+  }
+
+  res.status(200).json(filteredBooks);
 };
 
 // POST (create) book
