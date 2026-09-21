@@ -1,8 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-
 import { authors, type Author } from "../models/Author.js";
-
 import { ApiError } from "../utils/ApiError.js";
+import { books } from "../models/Book.js";
 
 // GET all authors
 export const getAuthors = (req: Request, res: Response) => {
@@ -80,4 +79,31 @@ export const deleteAuthor = (
   res.status(200).json({
     message: "Author deleted successfully",
   });
+};
+
+// GET books by author (GET /authors/:id/books)
+export const getBooksByAuthor = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = Number(req.params.id);
+
+  // Check if author exists
+  const author = authors.find(
+    (author) => author.id === id,
+  );
+
+  if (!author) {
+    return next(
+      new ApiError(404, "Author not found"),
+    );
+  }
+
+  // Find all books belonging to the author
+  const authorBooks = books.filter(
+    (book) => book.authorId === id,
+  );
+
+  res.status(200).json(authorBooks);
 };
