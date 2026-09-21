@@ -1,7 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
+
 import { authors, type Author } from "../models/Author.js";
-import { ApiError } from "../utils/ApiError.js";
+
 import { books } from "../models/Book.js";
+
+import { ApiError } from "../utils/ApiError.js";
 
 // GET all authors
 export const getAuthors = (req: Request, res: Response) => {
@@ -12,8 +15,14 @@ export const getAuthors = (req: Request, res: Response) => {
 export const createAuthor = (req: Request, res: Response) => {
   const { name } = req.body;
 
+  // Generate a new unique ID
+  const newId =
+    authors.length > 0
+      ? Math.max(...authors.map((author) => author.id)) + 1
+      : 1;
+
   const newAuthor: Author = {
-    id: authors.length + 1,
+    id: newId,
     name,
   };
 
@@ -81,7 +90,8 @@ export const deleteAuthor = (
   });
 };
 
-// GET books by author (GET /authors/:id/books)
+// GET books by author
+// GET /authors/:id/books
 export const getBooksByAuthor = (
   req: Request,
   res: Response,
@@ -90,20 +100,14 @@ export const getBooksByAuthor = (
   const id = Number(req.params.id);
 
   // Check if author exists
-  const author = authors.find(
-    (author) => author.id === id,
-  );
+  const author = authors.find((author) => author.id === id);
 
   if (!author) {
-    return next(
-      new ApiError(404, "Author not found"),
-    );
+    return next(new ApiError(404, "Author not found"));
   }
 
   // Find all books belonging to the author
-  const authorBooks = books.filter(
-    (book) => book.authorId === id,
-  );
+  const authorBooks = books.filter((book) => book.authorId === id);
 
   res.status(200).json(authorBooks);
 };
