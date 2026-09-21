@@ -41,3 +41,26 @@ export const getAuthorById = (
 
   res.status(200).json(author);
 };
+
+// PUT /authors/:id
+export const updateAuthor = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+  const { name } = req.body;
+
+  const author = authors.find(
+    (author) => author.id === id,
+  );
+
+  if (!author) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
+  author.name = name;
+
+  res.status(200).json(author);
+};
