@@ -21,3 +21,23 @@ export const createAuthor = (
 
   res.status(201).json(newAuthor);
 };
+
+// GET /authors/:id
+export const getAuthorById = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+
+  const author = authors.find(
+    (author) => author.id === id,
+  );
+
+  if (!author) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
+  res.status(200).json(author);
+};
