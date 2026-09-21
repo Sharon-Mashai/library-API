@@ -96,3 +96,27 @@ export const updateBook = (
 
   res.status(200).json(book);
 };
+
+// DELETE books by id
+export const deleteBook = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+
+  const bookIndex = books.findIndex(
+    (book) => book.id === id,
+  );
+
+  if (bookIndex === -1) {
+    return res.status(404).json({
+      message: "Book not found",
+    });
+  }
+
+  books.splice(bookIndex, 1);
+
+  res.status(200).json({
+    message: "Book deleted successfully",
+  });
+};
