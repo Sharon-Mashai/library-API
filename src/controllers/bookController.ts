@@ -1,9 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-
 import { books, type Book } from "../models/Book.js";
-
 import { authors } from "../models/Author.js";
-
 import { ApiError } from "../utils/ApiError.js";
 
 // GET all books
