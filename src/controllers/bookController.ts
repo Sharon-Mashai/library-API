@@ -59,3 +59,40 @@ export const getBookById = (
 
   res.status(200).json(book);
 };
+
+// PUT(Update) books by id
+export const updateBook = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+
+  const { title, year, authorId } = req.body;
+
+  const book = books.find(
+    (book) => book.id === id,
+  );
+
+  if (!book) {
+    return res.status(404).json({
+      message: "Book not found",
+    });
+  }
+
+  // Check if the new author exists
+  const author = authors.find(
+    (author) => author.id === authorId,
+  );
+
+  if (!author) {
+    return res.status(400).json({
+      message: "Invalid authorId",
+    });
+  }
+
+  book.title = title;
+  book.year = year;
+  book.authorId = authorId;
+
+  res.status(200).json(book);
+};
