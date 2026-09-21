@@ -12,12 +12,14 @@ export const getBooks = (req: Request, res: Response) => {
 export const createBook = (req: Request, res: Response, next: NextFunction) => {
   const { title, year, authorId } = req.body;
 
+  // Check if the author exists
   const author = authors.find((author) => author.id === authorId);
 
   if (!author) {
     return next(new ApiError(400, "Invalid authorId"));
   }
 
+  // Check if the book already exists
   const duplicateBook = books.find(
     (book) =>
       book.title.toLowerCase() === title.toLowerCase() &&
@@ -28,8 +30,12 @@ export const createBook = (req: Request, res: Response, next: NextFunction) => {
     return next(new ApiError(409, "Book already exists"));
   }
 
+  // Generate a new unique ID
+  const newId =
+    books.length > 0 ? Math.max(...books.map((book) => book.id)) + 1 : 1;
+
   const newBook: Book = {
-    id: books.length + 1,
+    id: newId,
     title,
     year,
     authorId,
@@ -57,24 +63,28 @@ export const getBookById = (
   res.status(200).json(book);
 };
 
-// PUT (update) books by ID
+// PUT (update) book by ID
 export const updateBook = (req: Request, res: Response, next: NextFunction) => {
   const id = Number(req.params.id);
 
   const { title, year, authorId } = req.body;
 
+  // Check if the book exists
   const book = books.find((book) => book.id === id);
 
   if (!book) {
     return next(new ApiError(404, "Book not found"));
   }
 
+  // Check if the author exists
   const author = authors.find((author) => author.id === authorId);
 
   if (!author) {
     return next(new ApiError(400, "Invalid authorId"));
   }
 
+  // Check if another book with the same
+  // title and author already exists
   const duplicateBook = books.find(
     (existingBook) =>
       existingBook.id !== id &&
@@ -86,6 +96,7 @@ export const updateBook = (req: Request, res: Response, next: NextFunction) => {
     return next(new ApiError(409, "Book already exists"));
   }
 
+  // Update the book
   book.title = title;
   book.year = year;
   book.authorId = authorId;
@@ -93,7 +104,7 @@ export const updateBook = (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json(book);
 };
 
-// DELETE books by ID
+// DELETE book by ID
 export const deleteBook = (req: Request, res: Response, next: NextFunction) => {
   const id = Number(req.params.id);
 
