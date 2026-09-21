@@ -1,13 +1,13 @@
 import type { Request, Response,} from "express";
 import { authors, type Author } from "../models/Author.js";
 
-// GET /authors
+// GET authors
 export const getAuthors = (
   req: Request,
   res: Response,
 ) => { res.status(200).json(authors)};
 
-// POST /authors
+// POST authors
 export const createAuthor = (
   req: Request,
   res: Response,) => {const { name } = req.body;
@@ -22,7 +22,7 @@ export const createAuthor = (
   res.status(201).json(newAuthor);
 };
 
-// GET /authors/:id
+// GET authors by id
 export const getAuthorById = (
   req: Request,
   res: Response,
@@ -42,7 +42,7 @@ export const getAuthorById = (
   res.status(200).json(author);
 };
 
-// PUT /authors/:id
+// PUT(Update) authors by id
 export const updateAuthor = (
   req: Request,
   res: Response,
@@ -63,4 +63,28 @@ export const updateAuthor = (
   author.name = name;
 
   res.status(200).json(author);
+};
+
+// DELETE authors by id
+export const deleteAuthor = (
+  req: Request,
+  res: Response,
+) => {
+  const id = Number(req.params.id);
+
+  const authorIndex = authors.findIndex(
+    (author) => author.id === id,
+  );
+
+  if (authorIndex === -1) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
+  authors.splice(authorIndex, 1);
+
+  res.status(200).json({
+    message: "Author deleted successfully",
+  });
 };
