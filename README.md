@@ -130,7 +130,7 @@ Books can be sorted by:
 Book results can be divided into pages using `page` and `limit` query parameters.
 
 ---
-
+ 
 # Postman Screenshots
 
 ### Create Author
@@ -251,7 +251,7 @@ You should see:
 Server is running on http://localhost:4000
 ```
 
-------------
+---
 
 # Author Endpoints
 
